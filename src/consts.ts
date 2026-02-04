@@ -1,5 +1,4 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
+// src/consts.ts
 
-export const SITE_TITLE = 'Astro Blog';
-export const SITE_DESCRIPTION = 'Welcome to my website!';
+export const SITE_TITLE = 'DevSEO | Technical SEO for Developers';
+export const SITE_DESCRIPTION = 'Master search engine optimization and high-performance web development with a developer-centric approach.';
