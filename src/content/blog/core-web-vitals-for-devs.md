@@ -2,7 +2,7 @@
 title: "Technical SEO: Mastering Core Web Vitals"
 description: "A deep dive into why performance metrics are the new backbone of search engine rankings for modern web apps."
 pubDate: "Feb 04 2026"
-heroImage: "/blog-placeholder-about.jpg"
+heroImage: '../../assets/blog-placeholder-about.jpg'
 ---
 
 # Technical SEO for Developers
