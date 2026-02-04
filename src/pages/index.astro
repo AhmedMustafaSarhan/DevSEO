@@ -1,14 +1,15 @@
 ---
 /**
- * Homepage
- * Entry point with locale support
+ * Professional Homepage
+ * Technical SEO Architect & Laravel Experts
+ * Features: Dark theme, semantic HTML5, performance-focused
  */
 
-import { DEFAULT_LOCALE, SITE_TITLE, SITE_DESCRIPTION } from '@/consts';
+import { SITE_TITLE, SITE_DESCRIPTION } from '@/consts';
 import Main from '@layouts/Main.astro';
 import { getLocaleFromPath } from '@utils/i18n-routing';
 import { getFeaturedPosts, getRecentPosts } from '@utils/api-helpers';
-import { getTranslation, formatDate } from '@utils/i18n';
+import { getTranslation, formatDate, formatSeoScore } from '@utils/i18n';
 
 const locale = getLocaleFromPath(Astro.url.pathname);
 const isArabic = locale === 'ar';
@@ -17,218 +18,373 @@ const isArabic = locale === 'ar';
 const featuredPosts = await getFeaturedPosts(3);
 const recentPosts = await getRecentPosts(5);
 
-const title = isArabic
-  ? 'مهندس تحسين محركات البحث التقني'
-  : 'Technical SEO Engineer';
+// Content based on locale
+const content = isArabic ? {
+  title: 'مهندس تحسين محركات البحث التقني',
+  subtitle: 'خبراء Laravel وأداء الويب',
+  heroDescription: 'نحن متخصصون في تحسين محركات البحث التقنية، Core Web Vitals، وتطوير تطبيقات ويب عالية الأداء',
+  cta1: 'شاهد المقالات',
+  cta2: 'احصل على استشارة',
+  services: 'خدماتنا',
+  service1Title: 'تحسين محركات البحث التقني',
+  service1Desc: 'تحليل شامل وتحسين لأداء موقعك وقابليته للعثور عليه',
+  service2Title: 'Core Web Vitals',
+  service2Desc: 'تحسين مؤشرات الويب الأساسية للحصول على تصنيفات أفضل',
+  service3Title: 'تطوير Laravel',
+  service3Desc: 'بناء تطبيقات ويب قوية وآمنة بأداء عالية مع Laravel',
+  articles: 'آخر المقالات التقنية',
+  readMore: 'اقرأ المزيد',
+  viewAllArticles: 'عرض جميع المقالات',
+  readingTime: 'دقيقة قراءة',
+} : {
+  title: 'Technical SEO Architect',
+  subtitle: 'Laravel Experts & Web Performance',
+  heroDescription: 'Specializing in Technical SEO, Core Web Vitals optimization, and high-performance web development with Laravel',
+  cta1: 'Read Articles',
+  cta2: 'Get Consultation',
+  services: 'Our Services',
+  service1Title: 'Technical SEO Optimization',
+  service1Desc: 'Comprehensive analysis and optimization for search visibility and performance',
+  service2Title: 'Core Web Vitals',
+  service2Desc: 'Optimize LCP, FID, and CLS metrics for better rankings and user experience',
+  service3Title: 'Laravel Development',
+  service3Desc: 'Build robust, secure web applications with optimal performance and scalability',
+  articles: 'Latest Technical Articles',
+  readMore: 'Read Article',
+  viewAllArticles: 'View All Articles',
+  readingTime: 'min read',
+};
 
-const description = isArabic
-  ? 'متخصص في تحسين محركات البحث التقنية وCore Web Vitals وتطوير الويب عالي الأداء'
-  : 'Specializing in Technical SEO, Core Web Vitals, and high-performance web development';
+const title = content.title;
+const description = content.heroDescription;
 
-const schema = {
+// Professional Service Schema
+const professionalServiceSchema = {
   '@context': 'https://schema.org',
-  '@type': 'WebSite',
+  '@type': 'ProfessionalService',
   name: 'DevSEO',
-  url: Astro.site,
-  description,
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: `${Astro.site}search?q={search_term}`,
-    },
-    'query-input': 'required name=search_term',
+  description: description,
+  url: Astro.site?.toString(),
+  telephone: '+1-XXX-XXX-XXXX',
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: isArabic ? 'EG' : 'US',
   },
+  areaServed: 'Worldwide',
+  serviceType: ['Technical SEO', 'Web Performance', 'Laravel Development'],
+  knowsAbout: ['Core Web Vitals', 'Schema Markup', 'Site Architecture', 'Performance Optimization'],
+  inLanguage: isArabic ? 'ar-EG' : 'en-US',
+  priceRange: '$$',
+};
+
+// Organization Schema
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'DevSEO',
+  description: description,
+  url: Astro.site?.toString(),
+  logo: `${Astro.site}favicon.svg`,
+  sameAs: ['https://github.com/AhmedMustafaSarhan'],
+  inLanguage: isArabic ? 'ar-EG' : 'en-US',
 };
 ---
 
 <Main
   title={title}
   description={description}
-  schema={schema}
+  schema={professionalServiceSchema}
 >
-  <!-- Hero Section -->
-  <section
-    class={`py-20 px-4 sm:px-6 lg:px-8 ${
+  <!-- Hero Section: Dark Gradient with Performance Focus -->
+  <header
+    class={`relative min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden ${
       isArabic ? 'text-right' : 'text-left'
     }`}
   >
-    <div class="max-w-4xl mx-auto">
-      <h1
-        class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight"
-      >
-        {title}
-      </h1>
-      <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-        {description}
-      </p>
-      <div class={`flex gap-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
-        <a
-          href={isArabic ? '/ar/blog' : '/blog'}
-          class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          {isArabic ? 'اقرأ المدونة' : 'Read Blog'}
-        </a>
-        <a
-          href={isArabic ? '/ar/about' : '/about'}
-          class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          {isArabic ? 'تعرف على المزيد' : 'Learn More'}
-        </a>
+    <!-- Animated background pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-0 left-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-screen filter blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-0 right-0 w-96 h-96 bg-secondary-500 rounded-full mix-blend-screen filter blur-3xl animate-pulse"></div>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
+      <div class="max-w-3xl">
+        <!-- Main Headline -->
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+          {content.title}
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-2xl md:text-3xl font-semibold text-primary-300 mb-6">
+          {content.subtitle}
+        </p>
+
+        <!-- Hero Description -->
+        <p class="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
+          {content.heroDescription}
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class={`flex gap-4 flex-wrap mb-12 ${isArabic ? 'flex-row-reverse' : ''}`}>
+          <a
+            href={isArabic ? '/ar/blog' : '/blog'}
+            class="px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary-500/50 transform hover:-translate-y-1"
+          >
+            {content.cta1}
+          </a>
+          <a
+            href={isArabic ? '/ar/about' : '/about'}
+            class="px-8 py-4 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition-all duration-300 border border-slate-600 hover:border-slate-500"
+          >
+            {content.cta2}
+          </a>
+        </div>
+
+        <!-- Trust Indicators -->
+        <div class={`flex flex-col sm:flex-row gap-8 text-sm text-gray-400 ${isArabic ? 'flex-row-reverse' : ''}`}>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">⚡</span>
+            <span>100/100 Lighthouse Score</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🚀</span>
+            <span>Sub-1s Load Time</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">📊</span>
+            <span>Data-Driven Results</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+      </svg>
+    </div>
+  </header>
+
+  <!-- Services Section: Professional Grid -->
+  <section class={`py-24 px-4 sm:px-6 lg:px-8 bg-slate-800 text-white ${isArabic ? 'text-right' : 'text-left'}`}>
+    <div class="max-w-6xl mx-auto">
+      <!-- Section Header -->
+      <div class={`max-w-3xl mb-16 ${isArabic ? 'ml-auto' : ''}`}>
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">{content.services}</h2>
+        <p class="text-lg text-gray-300">
+          {isArabic 
+            ? 'نقدم حلولاً متكاملة لتحسين أداء موقعك وترتيبه في محركات البحث'
+            : 'Comprehensive solutions to elevate your digital presence and search rankings'
+          }
+        </p>
+      </div>
+
+      <!-- Services Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Service 1: Technical SEO -->
+        <article class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl p-8 border border-slate-600 hover:border-primary-500 transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/20">
+          <div class="mb-6">
+            <span class="text-4xl">🔍</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">{content.service1Title}</h3>
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            {content.service1Desc}
+          </p>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'تحليل شامل للموقع' : 'Comprehensive Site Audit'}
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'تحسين البنية التحتية' : 'Site Architecture Optimization'}
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'ترميز المخطط' : 'Schema Markup Implementation'}
+              </span>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Service 2: Core Web Vitals -->
+        <article class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl p-8 border border-slate-600 hover:border-primary-500 transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/20">
+          <div class="mb-6">
+            <span class="text-4xl">⚡</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">{content.service2Title}</h3>
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            {content.service2Desc}
+          </p>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'تحسين LCP (تحميل أكبر عنصر)' : 'LCP Optimization'}
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'تقليل CLS (تحول التخطيط)' : 'CLS Reduction'}
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'تحسين FID (تأخير الإدخال)' : 'FID Optimization'}
+              </span>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Service 3: Laravel Development -->
+        <article class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl p-8 border border-slate-600 hover:border-primary-500 transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/20">
+          <div class="mb-6">
+            <span class="text-4xl">🚀</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">{content.service3Title}</h3>
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            {content.service3Desc}
+          </p>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'تطبيقات ويب سريعة وآمنة' : 'Fast & Secure Web Apps'}
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'معمارية قابلة للتوسع' : 'Scalable Architecture'}
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-primary-400 mt-1">✓</span>
+              <span>
+                {isArabic ? 'واجهات برمجية RESTful' : 'RESTful APIs'}
+              </span>
+            </li>
+          </ul>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- Featured Posts -->
+  <!-- Featured Posts Section -->
   {
     featuredPosts.length > 0 && (
-      <section
-        class={`py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 ${
-          isArabic ? 'text-right' : 'text-left'
-        }`}
-      >
+      <section class={`py-24 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white ${isArabic ? 'text-right' : 'text-left'}`}>
         <div class="max-w-6xl mx-auto">
-          <h2 class="text-3xl font-bold mb-12 text-gray-900">
-            {isArabic ? 'منشورات مميزة' : 'Featured Articles'}
-          </h2>
+          <h2 class="text-4xl md:text-5xl font-bold mb-12">{content.articles}</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredPosts.map((post) => (
-              <article
-                class={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden h-full flex flex-col ${
-                  isArabic ? 'text-right' : ''
-                }`}
-              >
+              <article class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-primary-500 transition-all duration-300 hover:shadow-lg hover:shadow-primary-500/10 flex flex-col group">
+                <!-- Article Image -->
                 {post.featured_image_url && (
-                  <img
-                    src={post.featured_image_url}
-                    alt={getTranslation(post.title, locale)}
-                    class="w-full h-48 object-cover"
-                    loading="lazy"
-                  />
+                  <div class="relative h-48 overflow-hidden bg-slate-700">
+                    <img
+                      src={post.featured_image_url}
+                      alt={getTranslation(post.title, locale)}
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    {post.seo_score && (
+                      <div class="absolute top-4 right-4 bg-slate-900/80 backdrop-blur px-3 py-1 rounded-full text-sm font-semibold">
+                        {post.seo_score >= 80
+                          ? '🟢 ' + post.seo_score
+                          : post.seo_score >= 60
+                            ? '🟡 ' + post.seo_score
+                            : '🔴 ' + post.seo_score}
+                      </div>
+                    )}
+                  </div>
                 )}
+
+                <!-- Article Content -->
                 <div class="p-6 flex flex-col flex-grow">
-                  <h3 class="text-xl font-semibold mb-2 text-gray-900">
+                  <h3 class="text-xl font-bold mb-3 group-hover:text-primary-400 transition-colors">
                     {getTranslation(post.title, locale)}
                   </h3>
-                  <p class="text-gray-600 mb-4 flex-grow">
-                    {getTranslation(post.description, locale).substring(0, 150)}
-                    ...
+                  <p class="text-gray-400 mb-4 flex-grow line-clamp-3">
+                    {getTranslation(post.description, locale)}
                   </p>
-                  <div
-                    class={`flex items-center justify-between text-sm text-gray-500 ${
-                      isArabic ? 'flex-row-reverse' : ''
-                    }`}
-                  >
-                    <span>
+
+                  <!-- Article Meta -->
+                  <div class={`flex items-center gap-4 text-sm text-gray-500 mb-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
+                    <time datetime={post.published_at || post.created_at}>
                       {formatDate(post.published_at || post.created_at, locale)}
-                    </span>
-                    <span class="flex items-center gap-1">
-                      {post.seo_score >= 80
-                        ? '🟢'
-                        : post.seo_score >= 60
-                          ? '🟡'
-                          : '🔴'}
-                      {post.seo_score}
-                    </span>
+                    </time>
+                    <span>•</span>
+                    <span>{post.views || 0} views</span>
                   </div>
+
+                  <!-- Read More Link -->
                   <a
-                    href={
-                      isArabic ? `/ar/blog/${post.slug}` : `/blog/${post.slug}`
-                    }
-                    class="mt-4 inline-block text-blue-600 font-semibold hover:text-blue-700"
+                    href={isArabic ? `/ar/blog/${post.slug}` : `/blog/${post.slug}`}
+                    class="inline-flex items-center gap-2 text-primary-400 font-semibold group-hover:gap-3 transition-all"
                   >
-                    {isArabic ? 'اقرأ المزيد →' : 'Read More →'}
+                    {content.readMore}
+                    <span>→</span>
                   </a>
                 </div>
               </article>
             ))}
+          </div>
+
+          <!-- View All Articles Link -->
+          <div class="mt-12 text-center">
+            <a
+              href={isArabic ? '/ar/blog' : '/blog'}
+              class="inline-block px-8 py-3 border-2 border-primary-500 text-primary-400 font-semibold rounded-lg hover:bg-primary-500/10 transition-colors"
+            >
+              {content.viewAllArticles}
+            </a>
           </div>
         </div>
       </section>
     )
   }
 
-  <!-- Recent Posts -->
-  {
-    recentPosts.length > 0 && (
-      <section
-        class={`py-16 px-4 sm:px-6 lg:px-8 ${
-          isArabic ? 'text-right' : 'text-left'
-        }`}
-      >
-        <div class="max-w-6xl mx-auto">
-          <h2 class="text-3xl font-bold mb-12 text-gray-900">
-            {isArabic ? 'آخر المنشورات' : 'Latest Articles'}
-          </h2>
-          <div class="space-y-8">
-            {recentPosts.map((post) => (
-              <article
-                class={`border-b border-gray-200 pb-8 last:border-b-0 ${
-                  isArabic ? 'text-right' : ''
-                }`}
-              >
-                <h3 class="text-2xl font-semibold mb-3 text-gray-900">
-                  <a
-                    href={
-                      isArabic ? `/ar/blog/${post.slug}` : `/blog/${post.slug}`
-                    }
-                    class="hover:text-blue-600 transition-colors"
-                  >
-                    {getTranslation(post.title, locale)}
-                  </a>
-                </h3>
-                <p class="text-gray-600 mb-4">
-                  {getTranslation(post.description, locale)}
-                </p>
-                <div
-                  class={`flex items-center gap-4 text-sm text-gray-500 ${
-                    isArabic ? 'flex-row-reverse' : ''
-                  }`}
-                >
-                  <span>
-                    {formatDate(post.published_at || post.created_at, locale)}
-                  </span>
-                  <span>•</span>
-                  <span>{post.views || 0} views</span>
-                  <span>•</span>
-                  <span class="flex items-center gap-1">
-                    {post.seo_score >= 80
-                      ? '🟢'
-                      : post.seo_score >= 60
-                        ? '🟡'
-                        : '🔴'}
-                    SEO: {post.seo_score}
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-    )
-  }
+  <!-- CTA Section: Dark Premium -->
+  <section class={`py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-600 to-secondary-600 text-white relative overflow-hidden ${
+    isArabic ? 'text-right' : 'text-left'
+  }`}>
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-0 right-0 w-80 h-80 bg-white rounded-full mix-blend-overlay filter blur-3xl"></div>
+    </div>
 
-  <!-- CTA Section -->
-  <section
-    class={`py-16 px-4 sm:px-6 lg:px-8 bg-blue-600 text-white ${
-      isArabic ? 'text-right' : 'text-left'
-    }`}
-  >
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-6">
-        {isArabic ? 'هل تريد تحسين SEO موقعك؟' : 'Want to Improve Your SEO?'}
+    <div class="relative z-10 max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6">
+        {isArabic ? 'هل أنت مستعد لتحسين أداء موقعك؟' : 'Ready to Transform Your Digital Presence?'}
       </h2>
-      <p class="text-lg mb-8 opacity-90">
+      <p class="text-lg md:text-xl mb-10 opacity-90">
         {isArabic
-          ? 'احصل على نصائح واستراتيجيات لتحسين ترتيب موقعك في محركات البحث'
-          : 'Get expert tips and strategies to boost your search rankings'}
+          ? 'دعنا نساعدك في الوصول إلى القمة في نتائج البحث وتحسين تجربة المستخدم'
+          : 'Let\'s work together to dominate search results and deliver exceptional user experience'}
       </p>
-      <a
-        href={isArabic ? '/ar/contact' : '/contact'}
-        class="inline-block px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
-      >
-        {isArabic ? 'تواصل معي' : 'Get in Touch'}
-      </a>
+      <div class={`flex gap-4 justify-center flex-wrap ${isArabic ? 'flex-row-reverse' : ''}`}>
+        <a
+          href={isArabic ? '/ar/contact' : '/contact'}
+          class="px-8 py-4 bg-white text-primary-600 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+        >
+          {isArabic ? 'احجز استشارة مجانية' : 'Book Free Consultation'}
+        </a>
+        <a
+          href={isArabic ? '/ar/blog' : '/blog'}
+          class="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
+        >
+          {isArabic ? 'اقرأ المزيد' : 'Learn More'}
+        </a>
+      </div>
     </div>
   </section>
 </Main>
