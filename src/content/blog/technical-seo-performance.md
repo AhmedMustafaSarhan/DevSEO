@@ -2,7 +2,7 @@
 title: "Technical SEO: Why Performance is the New Ranking Factor"
 description: "Exploring how Core Web Vitals and site speed directly impact your search engine visibility."
 pubDate: "Feb 04 2026"
-heroImage: "/blog-placeholder-2.jpg"
+heroImage: "/blog-placeholder-about.jpg"
 ---
 
 # Technical SEO for Developers
