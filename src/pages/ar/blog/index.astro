@@ -1,7 +1,7 @@
 ---
 /**
- * Blog Listing Page
- * /blog
+ * Arabic Blog Listing Page
+ * /ar/blog
  */
 
 import { getLocaleFromPath } from '@utils/i18n-routing';
@@ -9,24 +9,23 @@ import { getAllBlogPosts } from '@utils/api-helpers';
 import { getTranslation, formatDate } from '@utils/i18n';
 import Main from '@layouts/Main.astro';
 
-const locale = getLocaleFromPath(Astro.url.pathname);
-const isArabic = locale === 'ar';
+const locale = 'ar';
 
 // Get all published posts
 const allPosts = await getAllBlogPosts();
 const posts = allPosts.filter((post) => post.published);
 
-const title = isArabic ? 'المدونة' : 'Blog';
-const description = isArabic
-  ? 'مقالات عن تحسين محركات البحث التقني والأداء والتطوير'
-  : 'Articles about technical SEO, performance, and web development';
+const title = 'المدونة';
+const description =
+  'مقالات عن تحسين محركات البحث التقني والأداء والتطوير';
 
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: title,
   description: description,
-  url: `${Astro.site}${isArabic ? 'ar/' : ''}blog`,
+  inLanguage: 'ar-EG',
+  url: `${Astro.site}ar/blog`,
 };
 ---
 
@@ -37,47 +36,37 @@ const schema = {
 >
   <!-- Header -->
   <section
-    class={`py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-700 text-white ${
-      isArabic ? 'text-right' : 'text-left'
-    }`}
+    class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-right"
   >
     <div class="max-w-4xl mx-auto">
       <h1 class="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
       <p class="text-xl opacity-90">{description}</p>
       <p class="mt-4 text-sm opacity-75">
-        {posts.length} {isArabic ? 'مقالة' : 'articles'}
+        {posts.length} مقالة
       </p>
     </div>
   </section>
 
   <!-- Blog Posts Grid -->
-  <section
-    class={`max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 ${
-      isArabic ? 'text-right' : 'text-left'
-    }`}
-  >
+  <section class="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-right">
     {posts.length > 0 ? (
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {posts.map((post) => (
           <article
-            class={`bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-full group ${
-              isArabic ? 'text-right' : ''
-            }`}
+            class="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-full group text-right"
           >
             {/* Image Container */}
             {post.featured_image_url && (
               <div class="relative overflow-hidden h-48 bg-gray-200">
                 <img
                   src={post.featured_image_url}
-                  alt={getTranslation(post.title, locale)}
+                  alt={getTranslation(post.title, 'ar')}
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                 />
                 {/* SEO Badge */}
                 <div
-                  class={`absolute top-3 ${
-                    isArabic ? 'left-3' : 'right-3'
-                  } px-3 py-1 rounded-full font-bold text-sm ${
+                  class={`absolute top-3 left-3 px-3 py-1 rounded-full font-bold text-sm ${
                     post.seo_score >= 80
                       ? 'bg-green-100 text-green-800'
                       : post.seo_score >= 60
@@ -99,22 +88,20 @@ const schema = {
             <div class="p-6 flex flex-col flex-grow">
               {/* Title */}
               <h2 class="text-xl font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors">
-                <a
-                  href={isArabic ? `/ar/blog/${post.slug}` : `/blog/${post.slug}`}
-                >
-                  {getTranslation(post.title, locale)}
+                <a href={`/ar/blog/${post.slug}`}>
+                  {getTranslation(post.title, 'ar')}
                 </a>
               </h2>
 
               {/* Categories */}
               {post.categories && post.categories.length > 0 && (
-                <div class={`flex gap-2 mb-3 flex-wrap ${isArabic ? 'flex-row-reverse' : ''}`}>
+                <div class="flex gap-2 mb-3 flex-wrap flex-row-reverse">
                   {post.categories.slice(0, 2).map((category) => (
                     <span
                       key={category.id}
                       class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded"
                     >
-                      {getTranslation(category.name, locale)}
+                      {getTranslation(category.name, 'ar')}
                     </span>
                   ))}
                 </div>
@@ -122,28 +109,24 @@ const schema = {
 
               {/* Description */}
               <p class="text-gray-600 mb-4 flex-grow line-clamp-3">
-                {getTranslation(post.description, locale)}
+                {getTranslation(post.description, 'ar')}
               </p>
 
               {/* Meta Info */}
-              <div
-                class={`flex items-center gap-3 text-xs text-gray-500 pt-4 border-t border-gray-200 ${
-                  isArabic ? 'flex-row-reverse' : ''
-                }`}
-              >
+              <div class="flex items-center gap-3 text-xs text-gray-500 pt-4 border-t border-gray-200 flex-row-reverse">
                 <time datetime={post.published_at || post.created_at}>
-                  {formatDate(post.published_at || post.created_at, locale)}
+                  {formatDate(post.published_at || post.created_at, 'ar')}
                 </time>
                 <span>•</span>
-                <span>{post.views || 0} {isArabic ? 'مشاهدة' : 'views'}</span>
+                <span>{post.views || 0} مشاهدة</span>
               </div>
 
               {/* Read More Button */}
               <a
-                href={isArabic ? `/ar/blog/${post.slug}` : `/blog/${post.slug}`}
+                href={`/ar/blog/${post.slug}`}
                 class="mt-4 inline-block text-blue-600 font-semibold hover:text-blue-700 transition-colors"
               >
-                {isArabic ? 'اقرأ المزيد →' : 'Read More →'}
+                اقرأ المزيد ←
               </a>
             </div>
           </article>
@@ -151,32 +134,24 @@ const schema = {
       </div>
     ) : (
       <div class="text-center py-16">
-        <p class="text-gray-500 text-lg">
-          {isArabic ? 'لا توجد مقالات حالياً' : 'No articles yet'}
-        </p>
+        <p class="text-gray-500 text-lg">لا توجد مقالات حالياً</p>
       </div>
     )}
   </section>
 
   <!-- Newsletter Signup -->
-  <section
-    class={`bg-gray-50 py-16 px-4 sm:px-6 lg:px-8 ${
-      isArabic ? 'text-right' : 'text-left'
-    }`}
-  >
+  <section class="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8 text-right">
     <div class="max-w-2xl mx-auto">
       <h3 class="text-3xl font-bold mb-4 text-gray-900">
-        {isArabic ? 'اشترك في النشرة البريدية' : 'Subscribe to Newsletter'}
+        اشترك في النشرة البريدية
       </h3>
       <p class="text-gray-600 mb-6">
-        {isArabic
-          ? 'احصل على أحدث المقالات والنصائح مباشرة في بريدك الإلكتروني'
-          : 'Get the latest articles and tips delivered to your inbox'}
+        احصل على أحدث المقالات والنصائح مباشرة في بريدك الإلكتروني
       </p>
-      <form class={`flex gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
+      <form class="flex gap-2 flex-row-reverse">
         <input
           type="email"
-          placeholder={isArabic ? 'بريدك الإلكتروني' : 'Your email'}
+          placeholder="بريدك الإلكتروني"
           class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600"
           required
         />
@@ -184,7 +159,7 @@ const schema = {
           type="submit"
           class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
         >
-          {isArabic ? 'اشترك' : 'Subscribe'}
+          اشترك
         </button>
       </form>
     </div>

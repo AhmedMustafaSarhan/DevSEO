@@ -1,0 +1,175 @@
+---
+/**
+ * Arabic Homepage
+ * /ar route
+ */
+
+import { getLocaleFromPath } from '@utils/i18n-routing';
+import { getFeaturedPosts, getRecentPosts } from '@utils/api-helpers';
+import { getTranslation, formatDate } from '@utils/i18n';
+import Main from '@layouts/Main.astro';
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const isArabic = locale === 'ar';
+
+const featuredPosts = await getFeaturedPosts(3);
+const recentPosts = await getRecentPosts(5);
+
+const title = 'مهندس تحسين محركات البحث التقني';
+const description =
+  'متخصص في تحسين محركات البحث التقنية وCore Web Vitals وتطوير الويب عالي الأداء';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'DevSEO',
+  url: Astro.site,
+  description,
+  inLanguage: 'ar-EG',
+};
+---
+
+<Main
+  title={title}
+  description={description}
+  schema={schema}
+>
+  <!-- Hero Section -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 text-right">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">
+        {title}
+      </h1>
+      <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+        {description}
+      </p>
+      <div class="flex gap-4 flex-row-reverse">
+        <a
+          href="/ar/blog"
+          class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          اقرأ المدونة
+        </a>
+        <a
+          href="/ar/about"
+          class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          تعرف على المزيد
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Posts -->
+  {
+    featuredPosts.length > 0 && (
+      <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 text-right">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-3xl font-bold mb-12 text-gray-900">منشورات مميزة</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredPosts.map((post) => (
+              <article class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden h-full flex flex-col text-right">
+                {post.featured_image_url && (
+                  <img
+                    src={post.featured_image_url}
+                    alt={getTranslation(post.title, 'ar')}
+                    class="w-full h-48 object-cover"
+                    loading="lazy"
+                  />
+                )}
+                <div class="p-6 flex flex-col flex-grow">
+                  <h3 class="text-xl font-semibold mb-2 text-gray-900">
+                    {getTranslation(post.title, 'ar')}
+                  </h3>
+                  <p class="text-gray-600 mb-4 flex-grow">
+                    {getTranslation(post.description, 'ar').substring(0, 150)}
+                    ...
+                  </p>
+                  <div class="flex items-center justify-between text-sm text-gray-500 flex-row-reverse">
+                    <span>
+                      {formatDate(post.published_at || post.created_at, 'ar')}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      {post.seo_score >= 80
+                        ? '🟢'
+                        : post.seo_score >= 60
+                          ? '🟡'
+                          : '🔴'}
+                      {post.seo_score}
+                    </span>
+                  </div>
+                  <a
+                    href={`/ar/blog/${post.slug}`}
+                    class="mt-4 inline-block text-blue-600 font-semibold hover:text-blue-700"
+                  >
+                    اقرأ المزيد ←
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Recent Posts -->
+  {
+    recentPosts.length > 0 && (
+      <section class="py-16 px-4 sm:px-6 lg:px-8 text-right">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-3xl font-bold mb-12 text-gray-900">آخر المنشورات</h2>
+          <div class="space-y-8">
+            {recentPosts.map((post) => (
+              <article class="border-b border-gray-200 pb-8 last:border-b-0">
+                <h3 class="text-2xl font-semibold mb-3 text-gray-900">
+                  <a
+                    href={`/ar/blog/${post.slug}`}
+                    class="hover:text-blue-600 transition-colors"
+                  >
+                    {getTranslation(post.title, 'ar')}
+                  </a>
+                </h3>
+                <p class="text-gray-600 mb-4">
+                  {getTranslation(post.description, 'ar')}
+                </p>
+                <div class="flex items-center gap-4 text-sm text-gray-500 flex-row-reverse">
+                  <span>
+                    {formatDate(post.published_at || post.created_at, 'ar')}
+                  </span>
+                  <span>•</span>
+                  <span>{post.views || 0} مشاهدة</span>
+                  <span>•</span>
+                  <span class="flex items-center gap-1">
+                    {post.seo_score >= 80
+                      ? '🟢'
+                      : post.seo_score >= 60
+                        ? '🟡'
+                        : '🔴'}
+                    SEO: {post.seo_score}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- CTA Section -->
+  <section class="py-16 px-4 sm:px-6 lg:px-8 bg-blue-600 text-white text-right">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-6">هل تريد تحسين SEO موقعك؟</h2>
+      <p class="text-lg mb-8 opacity-90">
+        احصل على نصائح واستراتيجيات لتحسين ترتيب موقعك في محركات البحث
+      </p>
+      <a
+        href="/ar/contact"
+        class="inline-block px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        تواصل معي
+      </a>
+    </div>
+  </section>
+</Main>

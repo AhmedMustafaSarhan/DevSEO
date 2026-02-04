@@ -1,28 +1,234 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+/**
+ * Homepage
+ * Entry point with locale support
+ */
+
+import { DEFAULT_LOCALE, SITE_TITLE, SITE_DESCRIPTION } from '@/consts';
+import Main from '@layouts/Main.astro';
+import { getLocaleFromPath } from '@utils/i18n-routing';
+import { getFeaturedPosts, getRecentPosts } from '@utils/api-helpers';
+import { getTranslation, formatDate } from '@utils/i18n';
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const isArabic = locale === 'ar';
+
+// Fetch featured posts for homepage
+const featuredPosts = await getFeaturedPosts(3);
+const recentPosts = await getRecentPosts(5);
+
+const title = isArabic
+  ? 'مهندس تحسين محركات البحث التقني'
+  : 'Technical SEO Engineer';
+
+const description = isArabic
+  ? 'متخصص في تحسين محركات البحث التقنية وCore Web Vitals وتطوير الويب عالي الأداء'
+  : 'Specializing in Technical SEO, Core Web Vitals, and high-performance web development';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'DevSEO',
+  url: Astro.site,
+  description,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${Astro.site}search?q={search_term}`,
+    },
+    'query-input': 'required name=search_term',
+  },
+};
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🚀 Welcome to DevSEO</h1>
-			<p>
-				The definitive resource for developers to master <strong>Technical SEO</strong>. 
-				Built with high-performance standards using Astro and modern web technologies.
-			</p>
-			<p>
-				As a developer, you know that performance is the foundation of SEO. Here, we explore 
-				advanced strategies for Laravel, Filament, and static-site optimization.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<Main
+  title={title}
+  description={description}
+  schema={schema}
+>
+  <!-- Hero Section -->
+  <section
+    class={`py-20 px-4 sm:px-6 lg:px-8 ${
+      isArabic ? 'text-right' : 'text-left'
+    }`}
+  >
+    <div class="max-w-4xl mx-auto">
+      <h1
+        class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight"
+      >
+        {title}
+      </h1>
+      <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+        {description}
+      </p>
+      <div class={`flex gap-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
+        <a
+          href={isArabic ? '/ar/blog' : '/blog'}
+          class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          {isArabic ? 'اقرأ المدونة' : 'Read Blog'}
+        </a>
+        <a
+          href={isArabic ? '/ar/about' : '/about'}
+          class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          {isArabic ? 'تعرف على المزيد' : 'Learn More'}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Posts -->
+  {
+    featuredPosts.length > 0 && (
+      <section
+        class={`py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 ${
+          isArabic ? 'text-right' : 'text-left'
+        }`}
+      >
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-3xl font-bold mb-12 text-gray-900">
+            {isArabic ? 'منشورات مميزة' : 'Featured Articles'}
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredPosts.map((post) => (
+              <article
+                class={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden h-full flex flex-col ${
+                  isArabic ? 'text-right' : ''
+                }`}
+              >
+                {post.featured_image_url && (
+                  <img
+                    src={post.featured_image_url}
+                    alt={getTranslation(post.title, locale)}
+                    class="w-full h-48 object-cover"
+                    loading="lazy"
+                  />
+                )}
+                <div class="p-6 flex flex-col flex-grow">
+                  <h3 class="text-xl font-semibold mb-2 text-gray-900">
+                    {getTranslation(post.title, locale)}
+                  </h3>
+                  <p class="text-gray-600 mb-4 flex-grow">
+                    {getTranslation(post.description, locale).substring(0, 150)}
+                    ...
+                  </p>
+                  <div
+                    class={`flex items-center justify-between text-sm text-gray-500 ${
+                      isArabic ? 'flex-row-reverse' : ''
+                    }`}
+                  >
+                    <span>
+                      {formatDate(post.published_at || post.created_at, locale)}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      {post.seo_score >= 80
+                        ? '🟢'
+                        : post.seo_score >= 60
+                          ? '🟡'
+                          : '🔴'}
+                      {post.seo_score}
+                    </span>
+                  </div>
+                  <a
+                    href={
+                      isArabic ? `/ar/blog/${post.slug}` : `/blog/${post.slug}`
+                    }
+                    class="mt-4 inline-block text-blue-600 font-semibold hover:text-blue-700"
+                  >
+                    {isArabic ? 'اقرأ المزيد →' : 'Read More →'}
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Recent Posts -->
+  {
+    recentPosts.length > 0 && (
+      <section
+        class={`py-16 px-4 sm:px-6 lg:px-8 ${
+          isArabic ? 'text-right' : 'text-left'
+        }`}
+      >
+        <div class="max-w-6xl mx-auto">
+          <h2 class="text-3xl font-bold mb-12 text-gray-900">
+            {isArabic ? 'آخر المنشورات' : 'Latest Articles'}
+          </h2>
+          <div class="space-y-8">
+            {recentPosts.map((post) => (
+              <article
+                class={`border-b border-gray-200 pb-8 last:border-b-0 ${
+                  isArabic ? 'text-right' : ''
+                }`}
+              >
+                <h3 class="text-2xl font-semibold mb-3 text-gray-900">
+                  <a
+                    href={
+                      isArabic ? `/ar/blog/${post.slug}` : `/blog/${post.slug}`
+                    }
+                    class="hover:text-blue-600 transition-colors"
+                  >
+                    {getTranslation(post.title, locale)}
+                  </a>
+                </h3>
+                <p class="text-gray-600 mb-4">
+                  {getTranslation(post.description, locale)}
+                </p>
+                <div
+                  class={`flex items-center gap-4 text-sm text-gray-500 ${
+                    isArabic ? 'flex-row-reverse' : ''
+                  }`}
+                >
+                  <span>
+                    {formatDate(post.published_at || post.created_at, locale)}
+                  </span>
+                  <span>•</span>
+                  <span>{post.views || 0} views</span>
+                  <span>•</span>
+                  <span class="flex items-center gap-1">
+                    {post.seo_score >= 80
+                      ? '🟢'
+                      : post.seo_score >= 60
+                        ? '🟡'
+                        : '🔴'}
+                    SEO: {post.seo_score}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- CTA Section -->
+  <section
+    class={`py-16 px-4 sm:px-6 lg:px-8 bg-blue-600 text-white ${
+      isArabic ? 'text-right' : 'text-left'
+    }`}
+  >
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-6">
+        {isArabic ? 'هل تريد تحسين SEO موقعك؟' : 'Want to Improve Your SEO?'}
+      </h2>
+      <p class="text-lg mb-8 opacity-90">
+        {isArabic
+          ? 'احصل على نصائح واستراتيجيات لتحسين ترتيب موقعك في محركات البحث'
+          : 'Get expert tips and strategies to boost your search rankings'}
+      </p>
+      <a
+        href={isArabic ? '/ar/contact' : '/contact'}
+        class="inline-block px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        {isArabic ? 'تواصل معي' : 'Get in Touch'}
+      </a>
+    </div>
+  </section>
+</Main>

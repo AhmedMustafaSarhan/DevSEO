@@ -1,0 +1,105 @@
+---
+/**
+ * SEO Component
+ * Renders all SEO-related meta tags and structured data
+ * Maps Laravel API meta_tags, og_image, and schema_json directly
+ */
+
+export interface Props {
+  // Basic metadata
+  title: string;
+  description: string;
+
+  // Images
+  image?: string;
+  ogImage?: string;
+
+  // Canonical URL
+  canonical?: string;
+
+  // Article metadata
+  articlePublished?: string;
+  articleModified?: string;
+  articleAuthor?: string;
+
+  // Structured data (JSON-LD)
+  schema?: object;
+
+  // Language
+  locale?: 'en' | 'ar';
+}
+
+const {
+  title,
+  description,
+  image = '/og-default.png',
+  ogImage,
+  canonical,
+  articlePublished,
+  articleModified,
+  articleAuthor,
+  schema,
+  locale = 'en',
+} = Astro.props as Props;
+
+// Use provided og image or fall back to regular image
+const socialImage = ogImage || image;
+
+// Build canonical URL
+const canonicalUrl = canonical || Astro.url.href;
+
+// Determine text direction
+const dir = locale === 'ar' ? 'rtl' : 'ltr';
+---
+
+<!-- Basic Meta Tags -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content={description} />
+<meta name="language" content={locale === 'ar' ? 'Arabic' : 'English'} />
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={socialImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content={locale === 'ar' ? 'ar_EG' : 'en_US'} />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalUrl} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={socialImage} />
+
+<!-- Article Metadata (if provided) -->
+{articlePublished && <meta property="article:published_time" content={articlePublished} />}
+{articleModified && <meta property="article:modified_time" content={articleModified} />}
+{articleAuthor && <meta property="article:author" content={articleAuthor} />}
+
+<!-- Structured Data (JSON-LD) -->
+{schema && (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+)}
+
+<!-- Favicon and App Icons -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.json" />
+
+<!-- Theme Color -->
+<meta name="theme-color" content="#0284c7" />
+
+<!-- Text Direction for RTL -->
+{locale === 'ar' && <meta name="text-direction" content="rtl" />}
+
+<!-- Preconnect to API -->
+<link rel="preconnect" href="https://api.devseo.dev" />
+<link rel="dns-prefetch" href="https://api.devseo.dev" />

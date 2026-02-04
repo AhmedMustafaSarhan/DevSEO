@@ -1,0 +1,104 @@
+---
+/**
+ * Main Layout Component
+ * Applied to all pages
+ */
+
+import SEO from '@components/SEO.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  ogImage?: string;
+  canonical?: string;
+  schema?: object;
+  articlePublished?: string;
+  articleModified?: string;
+  articleAuthor?: string;
+}
+
+const {
+  title = 'DevSEO | Technical SEO for Developers',
+  description = 'Expert Laravel developer specializing in Technical SEO, Core Web Vitals, and high-performance web development.',
+  image = '/og-default.png',
+  ogImage,
+  canonical,
+  schema,
+  articlePublished,
+  articleModified,
+  articleAuthor,
+} = Astro.props;
+
+// Detect locale from URL
+const locale = Astro.url.pathname.startsWith('/ar') ? 'ar' : 'en';
+const dir = locale === 'ar' ? 'rtl' : 'ltr';
+---
+
+<!DOCTYPE html>
+<html lang={locale} dir={dir} class="scroll-smooth">
+  <head>
+    <SEO
+      {title}
+      {description}
+      {image}
+      {ogImage}
+      {canonical}
+      {schema}
+      {articlePublished}
+      {articleModified}
+      {articleAuthor}
+      {locale}
+    />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-white text-gray-900 antialiased">
+    <Header locale={locale} />
+    <main class={locale === 'ar' ? 'rtl' : 'ltr'}>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+
+    <style is:global>
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+
+      /* Optimize font rendering */
+      html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Reduce CLS with explicit font-display */
+      @font-face {
+        font-family: 'Inter';
+        font-display: swap;
+      }
+
+      /* Performance: LCP optimization */
+      body > * {
+        will-change: auto;
+      }
+
+      /* Smooth transitions without compromising performance */
+      * {
+        @apply transition-colors duration-200;
+      }
+
+      button,
+      a {
+        @apply transition-all duration-200;
+      }
+    </style>
+  </body>
+</html>

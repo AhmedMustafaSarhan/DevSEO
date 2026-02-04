@@ -1,0 +1,225 @@
+---
+/**
+ * Dynamic Blog Post Route
+ * Generates static pages for each blog post
+ * /blog/[slug].astro
+ */
+
+import type { GetStaticPaths } from 'astro';
+import { generateBlogPostRoutes } from '@utils/api-helpers';
+import { getTranslation, formatDate, getReadingTime } from '@utils/i18n';
+import { buildImageUrl } from '@utils/i18n';
+import Main from '@layouts/Main.astro';
+import ApiClient from '@api/client';
+import type { BlogPost } from '@types/api';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const routes = await generateBlogPostRoutes();
+  return routes.map((route) => ({
+    ...route,
+    params: {
+      ...route.params,
+    },
+  }));
+};
+
+interface Props {
+  post: BlogPost;
+}
+
+const { post } = Astro.props;
+const locale = 'en';
+
+// Fetch full post details
+const fullPost = await ApiClient.getBlogPostBySlug(post.slug);
+
+// Build SEO metadata
+const title = getTranslation(fullPost.title, locale);
+const description = getTranslation(fullPost.description, locale);
+const image = buildImageUrl(fullPost.og_image || fullPost.featured_image_url);
+const canonical = `${Astro.site}blog/${fullPost.slug}`;
+
+// Parse schema
+const schema = fullPost.schema_json || {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description: description,
+  image: image,
+  datePublished: fullPost.published_at || fullPost.created_at,
+  dateModified: fullPost.updated_at,
+  author: {
+    '@type': 'Person',
+    name: fullPost.author?.name || 'DevSEO',
+  },
+  mainEntity: {
+    '@type': 'Article',
+    headline: title,
+    description: description,
+  },
+};
+
+const readingTime = getReadingTime(getTranslation(fullPost.content, locale));
+---
+
+<Main
+  title={title}
+  description={description}
+  image={image}
+  ogImage={fullPost.og_image}
+  canonical={canonical}
+  schema={schema}
+  articlePublished={fullPost.published_at}
+  articleModified={fullPost.updated_at}
+  articleAuthor={fullPost.author?.name}
+>
+  <!-- Article Header -->
+  <article class="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+    <!-- Meta Information -->
+    <div class="mb-8 border-b border-gray-200 pb-8">
+      <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+        <time datetime={fullPost.published_at || fullPost.created_at}>
+          {formatDate(fullPost.published_at || fullPost.created_at, 'en')}
+        </time>
+        <span>•</span>
+        <span>{readingTime} min read</span>
+        <span>•</span>
+        <span>{fullPost.views || 0} views</span>
+      </div>
+
+      <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">
+        {title}
+      </h1>
+
+      {fullPost.author && (
+        <div class="flex items-center gap-3">
+          <div>
+            <p class="font-semibold text-gray-900">By {fullPost.author.name}</p>
+            <p class="text-sm text-gray-500">
+              {fullPost.author.region === 'EG' ? 'Egypt' : fullPost.author.region === 'US' ? 'United States' : 'International'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <!-- SEO Score Badge -->
+      <div class="mt-6 flex items-center gap-2">
+        <span class="text-sm font-semibold">SEO Score:</span>
+        <span
+          class={`inline-flex items-center gap-2 px-3 py-1 rounded-full font-bold ${
+            fullPost.seo_score >= 80
+              ? 'bg-green-100 text-green-800'
+              : fullPost.seo_score >= 60
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {fullPost.seo_score >= 80
+            ? '🟢'
+            : fullPost.seo_score >= 60
+              ? '🟡'
+              : '🔴'}
+          {fullPost.seo_score}/100
+        </span>
+      </div>
+    </div>
+
+    <!-- Featured Image -->
+    {fullPost.featured_image_url && (
+      <figure class="mb-12">
+        <img
+          src={fullPost.featured_image_url}
+          alt={title}
+          class="w-full h-auto rounded-lg shadow-lg object-cover"
+          loading="lazy"
+        />
+        <figcaption class="mt-4 text-center text-sm text-gray-500">
+          {title}
+        </figcaption>
+      </figure>
+    )}
+
+    <!-- Content -->
+    <div
+      class="prose prose-lg max-w-none mb-12"
+      set:html={getTranslation(fullPost.content, locale)}
+    />
+
+    <!-- Categories & Tags -->
+    <div class="border-t border-gray-200 pt-8 mt-12">
+      {fullPost.categories && fullPost.categories.length > 0 && (
+        <div class="mb-6">
+          <h3 class="font-semibold text-gray-900 mb-3">Categories</h3>
+          <div class="flex flex-wrap gap-2">
+            {fullPost.categories.map((category) => (
+              <a
+                href={`/blog/category/${category.slug}`}
+                class="inline-flex px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
+              >
+                {getTranslation(category.name, 'en')}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {fullPost.tags && fullPost.tags.length > 0 && (
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-3">Tags</h3>
+          <div class="flex flex-wrap gap-2">
+            {fullPost.tags.map((tag) => (
+              <a
+                href={`/blog/tag/${tag.slug}`}
+                class="inline-flex px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
+              >
+                #{getTranslation(tag.name, 'en')}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </article>
+
+  <!-- Share Section -->
+  <section class="bg-gray-50 py-12 border-t border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-6">Share This Article</h3>
+      <div class="flex flex-wrap gap-4">
+        <a
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${canonical}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors"
+        >
+          Share on Twitter
+        </a>
+        <a
+          href={`https://www.linkedin.com/sharing/share-offsite/?url=${canonical}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
+        >
+          Share on LinkedIn
+        </a>
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${canonical}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Share on Facebook
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Posts -->
+  <section class="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+    <h3 class="text-3xl font-bold mb-12 text-gray-900">Related Articles</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Placeholder for related posts component -->
+      <p class="text-gray-500">Loading related articles...</p>
+    </div>
+  </section>
+</Main>
