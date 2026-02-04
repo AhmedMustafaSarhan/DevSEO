@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://devseo-10d.pages.dev/sitemap-index.xml
