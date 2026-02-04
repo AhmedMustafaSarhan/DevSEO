@@ -7,7 +7,7 @@
 
 import type { GetStaticPaths } from 'astro';
 import { generateBlogPostRoutes } from '@utils/api-helpers';
-import { getTranslation, formatDate, getReadingTime } from '@utils/i18n';
+import { getTranslation, formatDate, formatReadingTime } from '@utils/i18n';
 import { buildImageUrl } from '@utils/i18n';
 import Main from '@layouts/Main.astro';
 import ApiClient from '@api/client';
@@ -59,7 +59,7 @@ const schema = fullPost.schema_json || {
   },
 };
 
-const readingTime = getReadingTime(getTranslation(fullPost.content, locale));
+const readingTime = formatReadingTime(getTranslation(fullPost.content, locale), locale);
 ---
 
 <Main
